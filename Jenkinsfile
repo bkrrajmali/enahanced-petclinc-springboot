@@ -11,6 +11,8 @@ pipeline {
         IMAGE_NAME = 'bkrrajmali/petclinic'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
         SCANNER_HOME = tool 'Sonar-scanner'
+        ACR_LOGIN_SERVER = 'dockerregnodejs.azurecr.io'     // change to your actual ACR login server
+        ACR_CREDENTIALS_ID = 'acr-credentials'         // Jenkins credential ID with ACR username/password
     }
 
     stages {
@@ -61,13 +63,19 @@ pipeline {
             }
         }
 
-        stage('Docker Build & Push') {
-            steps {
-                script {
-                    dockerBuildAndPush("${IMAGE_NAME}", "${IMAGE_TAG}")
-                }
+    stage('Docker Build & Push') {
+        steps {
+            script {
+                dockerBuildAndPush(
+                    'petclinic', 
+                    "${env.BUILD_NUMBER}", 
+                    env.ACR_LOGIN_SERVER, 
+                    '', 
+                    env.ACR_CREDENTIALS_ID
+                )
             }
         }
+    }
 
         stage('Trivy Scan') {
             steps {
