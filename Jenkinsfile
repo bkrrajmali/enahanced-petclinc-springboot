@@ -46,8 +46,7 @@ pipeline {
             -Dsonar.java.binaries=target/classes
             -Dsonar.exclusions=**/trivy-report.txt
             ''')
-            }
-        }
+          }
     }
         stage('Quality Gate') {
             steps {
