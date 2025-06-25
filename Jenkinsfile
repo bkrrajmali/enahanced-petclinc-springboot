@@ -37,19 +37,18 @@ pipeline {
             }
         }
 
-      stage('SonarQube Scan') {
-    steps {
+     stage('SonarQube Scan') {
+        steps {
         sonarScan(params: '''
             -Dsonar.organization=bkrrajmali
             -Dsonar.projectName=petclinic
             -Dsonar.projectKey=bkrrajmali_petclinic
-            -Dsonar.java.binaries=.
+            -Dsonar.java.binaries=target/classes
             -Dsonar.exclusions=**/trivy-report.txt
-        ''')
+            ''')
+            }
+        }
     }
-}
-
-
         stage('Quality Gate') {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
