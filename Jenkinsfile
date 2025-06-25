@@ -27,21 +27,21 @@ pipeline {
                 stage('Maven Test') {
                     steps {
                         script {
-                            mvnTest()
+                            mvnStage('test')
                         }
                     }
                 }
                 stage('Maven Compile') {
                     steps {
                         script {
-                            mvnCompile()
+                            mvnStage('compile')
                         }
                     }
                 }
                 stage('Maven Package') {
                     steps {
                         script {
-                            mvnPackage()
+                            mvnStage('package')
                         }
                     }
                 }
