@@ -11,8 +11,8 @@ pipeline {
         IMAGE_NAME = 'bkrrajmali/petclinic'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
         SCANNER_HOME = tool 'Sonar-scanner'
-        ACR_LOGIN_SERVER = 'dockerregnodejs.azurecr.io'     // change to your actual ACR login server
-        ACR_CREDENTIALS_ID = 'acr-credentials'         // Jenkins credential ID with ACR username/password
+        ACR_LOGIN_SERVER = 'dockerregnodejs.azurecr.io'     
+        ACR_CREDENTIALS_ID = 'acr-credentials'         
     }
 
     stages {
@@ -88,10 +88,10 @@ pipeline {
 
     post {
         success {
-            echo "[LOG] ✅ Petclinic Pipeline completed successfully"
+            echo "[LOG]  Petclinic Pipeline completed successfully"
         }
         failure {
-            echo "[LOG] ❌ Petclinic Pipeline failed — check logs"
+            echo "[LOG]  Petclinic Pipeline failed — check logs"
         }
     }
 }
