@@ -43,14 +43,13 @@ pipeline {
 
         stage('SonarQube Scan') {
             steps {
-                sonarScan(params: '''
-                    -Dsonar.login=# 9a8882c023202f721366abf49d8da451824eff55
-                    -Dsonar.organization=bkrrajmali
-                    -Dsonar.projectKey=bkrrajmali_petclinic
-                    -Dsonar.projectName=petclinic
-                    -Dsonar.java.binaries=target/classes
-                    -Dsonar.exclusions=**/trivy-report.txt
-                ''')
+               sonarScan(params: '''
+            -Dsonar.login=$SONAR_TOKEN
+            -Dsonar.organization=bkrrajmali
+            -Dsonar.projectKey=bkrrajmali_petclinic
+            -Dsonar.projectName=petclinic
+            -Dsonar.java.binaries=target/classes
+        ''')
             }
         }
 
