@@ -2,7 +2,9 @@
 
 pipeline {
     agent any
-
+    tools {
+        maven 'maven'
+    }
     environment {
         IMAGE_NAME = 'myrepo/myapp'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
