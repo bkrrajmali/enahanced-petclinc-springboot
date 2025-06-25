@@ -21,36 +21,38 @@ pipeline {
             }
         }
 
-        stage('Maven Test') {
-            steps {
-                mvnStage('test')
-            }
-        }
-
-        stage('Maven Compile') {
-            steps {
-                mvnStage('compile')
-            }
-        }
-
-        stage('Maven Package') {
-            steps {
-                mvnStage('package')
+    stage('Parallel Maven Build') {
+            parallel {
+                stage('Maven Test') {
+                    steps {
+                        mvnStage('test')
+                    }
+                }
+                stage('Maven Compile') {
+                    steps {
+                        mvnStage('compile')
+                    }
+                }
+                stage('Maven Package') {
+                    steps {
+                        mvnStage('package')
+                    }
+                }
             }
         }
 
         stage('SonarQube Scan') {
-    steps {
-        sonarScan(params: '''
-            -Dsonar.organization=bkrrajmali
-            -Dsonar.projectName=petclinic
-            -Dsonar.projectKey=bkrrajmali_petclinic
-            -Dsonar.java.binaries=target/classes
-            -Dsonar.exclusions=**/trivy-report.txt
-        ''')
-    }
-}
-
+            steps {
+                sonarScan(params: '''
+                    -Dsonar.login=$SONAR_TOKEN
+                    -Dsonar.organization=bkrrajmali
+                    -Dsonar.projectKey=bkrrajmali_petclinic
+                    -Dsonar.projectName=petclinic
+                    -Dsonar.java.binaries=target/classes
+                    -Dsonar.exclusions=**/trivy-report.txt
+                ''')
+            }
+        }
 
         stage('Quality Gate') {
             steps {
@@ -82,4 +84,3 @@ pipeline {
         }
     }
 }
-
