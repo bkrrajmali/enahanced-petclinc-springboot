@@ -11,8 +11,8 @@ pipeline {
         IMAGE_NAME = 'bkrrajmali/petclinic'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
         SCANNER_HOME = tool 'Sonar-scanner'
-        ACR_LOGIN_SERVER = 'dockerregnodejs.azurecr.io'     
-        ACR_CREDENTIALS_ID = 'acr-credentials'         
+        ACR_LOGIN_SERVER = 'dockerregnodejs.azurecr.io'
+        ACR_CREDENTIALS_ID = 'acr-credentials'
     }
 
     stages {
@@ -26,17 +26,23 @@ pipeline {
             parallel {
                 stage('Maven Test') {
                     steps {
-                        sh 'mvn test'
+                        script {
+                            mvnTest()
+                        }
                     }
                 }
                 stage('Maven Compile') {
                     steps {
-                        sh 'mvn compile'
+                        script {
+                            mvnCompile()
+                        }
                     }
                 }
                 stage('Maven Package') {
                     steps {
-                        sh 'mvn package -DskipTests'
+                        script {
+                            mvnPackage()
+                        }
                     }
                 }
             }
@@ -63,19 +69,19 @@ pipeline {
             }
         }
 
-    stage('Docker Build & Push') {
-        steps {
-            script {
-                dockerBuildAndPush(
-                    'petclinic', 
-                    "${env.BUILD_NUMBER}", 
-                    env.ACR_LOGIN_SERVER, 
-                    '', 
-                    env.ACR_CREDENTIALS_ID
-                )
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    dockerBuildAndPush(
+                        'petclinic', 
+                        "${env.BUILD_NUMBER}", 
+                        env.ACR_LOGIN_SERVER, 
+                        '', 
+                        env.ACR_CREDENTIALS_ID
+                    )
+                }
             }
         }
-    }
 
         stage('Trivy Scan') {
             steps {
@@ -88,10 +94,14 @@ pipeline {
 
     post {
         success {
-            echo "[LOG]  Petclinic Pipeline completed successfully"
+            script {
+                log("Petclinic Pipeline completed successfully")
+            }
         }
         failure {
-            echo "[LOG]  Petclinic Pipeline failed — check logs"
+            script {
+                log("Petclinic Pipeline failed — check logs")
+            }
         }
     }
 }
