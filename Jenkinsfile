@@ -8,6 +8,7 @@ pipeline {
     environment {
         IMAGE_NAME = 'myrepo/myapp'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
+        SCANNER_HOME = tool 'Sonar-scanner'
     }
 
     stages {
@@ -36,19 +37,19 @@ pipeline {
             }
         }
 
-        // stage('SonarQube Scan') {
-        //     steps {
-        //         sonarScan()
-        //     }
-        // }
+        stage('SonarQube Scan') {
+            steps {
+                sonarScan()
+            }
+        }
 
-        // stage('Quality Gate') {
-        //     steps {
-        //         timeout(time: 2, unit: 'MINUTES') {
-        //             waitForQualityGate abortPipeline: true
-        //         }
-        //     }
-        // }
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
 
         // stage('Docker Build & Push') {
         //     steps {
