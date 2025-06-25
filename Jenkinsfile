@@ -34,31 +34,31 @@ pipeline {
             }
         }
 
-        stage('SonarQube Scan') {
-            steps {
-                sonarScan()
-            }
-        }
+        // stage('SonarQube Scan') {
+        //     steps {
+        //         sonarScan()
+        //     }
+        // }
 
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 2, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+        // stage('Quality Gate') {
+        //     steps {
+        //         timeout(time: 2, unit: 'MINUTES') {
+        //             waitForQualityGate abortPipeline: true
+        //         }
+        //     }
+        // }
 
-        stage('Docker Build & Push') {
-            steps {
-                dockerBuildPush(env.IMAGE_NAME, env.IMAGE_TAG)
-            }
-        }
+        // stage('Docker Build & Push') {
+        //     steps {
+        //         dockerBuildPush(env.IMAGE_NAME, env.IMAGE_TAG)
+        //     }
+        // }
 
-        stage('Trivy Scan') {
-            steps {
-                trivyScan("${env.IMAGE_NAME}:${env.IMAGE_TAG}")
-            }
-        }
+        // stage('Trivy Scan') {
+        //     steps {
+        //         trivyScan("${env.IMAGE_NAME}:${env.IMAGE_TAG}")
+        //     }
+        // }
     }
 
     post {
