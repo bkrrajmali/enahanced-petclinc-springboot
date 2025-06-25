@@ -4,38 +4,37 @@ pipeline {
     agent any
 
     tools {
-        maven 'maven' // Defined in Jenkins Global Tool Config
+        maven 'maven'
     }
 
     environment {
         IMAGE_NAME = 'bkrrajmali/petclinic'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
-        SCANNER_HOME = tool 'Sonar-scanner' // Optional if you're not using CLI scanner
+        SCANNER_HOME = tool 'Sonar-scanner'
     }
 
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
-                log("Code checked out")
             }
         }
 
-    stage('Parallel Maven Build') {
+        stage('Build - Maven Tasks in Parallel') {
             parallel {
                 stage('Maven Test') {
                     steps {
-                        mvnStage('test')
+                        sh 'mvn test'
                     }
                 }
                 stage('Maven Compile') {
                     steps {
-                        mvnStage('compile')
+                        sh 'mvn compile'
                     }
                 }
                 stage('Maven Package') {
                     steps {
-                        mvnStage('package')
+                        sh 'mvn package -DskipTests'
                     }
                 }
             }
@@ -43,13 +42,14 @@ pipeline {
 
         stage('SonarQube Scan') {
             steps {
-               sonarScan(params: '''
-            -Dsonar.login=$SONAR_TOKEN
-            -Dsonar.organization=bkrrajmali
-            -Dsonar.projectKey=bkrrajmali_petclinic
-            -Dsonar.projectName=petclinic
-            -Dsonar.java.binaries=target/classes
-        ''')
+                script {
+                    sonarScan([
+                        projectKey      : 'bkrrajmali_petclinic',
+                        organization    : 'bkrrajmali',
+                        projectName     : 'petclinic',
+                        exclusions      : '**/trivy-report.txt'
+                    ])
+                }
             }
         }
 
@@ -63,23 +63,27 @@ pipeline {
 
         stage('Docker Build & Push') {
             steps {
-                dockerBuildPush(env.IMAGE_NAME, env.IMAGE_TAG)
+                script {
+                    dockerBuildAndPush("${IMAGE_NAME}", "${IMAGE_TAG}")
+                }
             }
         }
 
         stage('Trivy Scan') {
             steps {
-                trivyScan("${env.IMAGE_NAME}:${env.IMAGE_TAG}")
+                script {
+                    trivyScan("${IMAGE_NAME}:${IMAGE_TAG}")
+                }
             }
         }
     }
 
     post {
         success {
-            log("✅ Petclinic Pipeline executed successfully")
+            echo "[LOG] ✅ Petclinic Pipeline completed successfully"
         }
         failure {
-            log("❌ Petclinic Pipeline failed — check logs")
+            echo "[LOG] ❌ Petclinic Pipeline failed — check logs"
         }
     }
 }
